@@ -30,8 +30,8 @@ The request JSON looks as:<pre>
 {
     "name": "apple pie",
     "description": "easy apple pie",
-    "ingredients": "100 g sugar, 200 g butter, 5 apples",
-    "directions": "make dough, put in oven and bake"
+    "ingredients": ["100 g sugar", "200 g butter", "5 apples"],
+    "directions": ["make dough", "put in oven", "bake at 200°"]
 }</pre> It returns the id in the store as key-value object.
 
 > <b>GET /api/recipe/{id} (unauthenticated)</b>. -> receives recipe with id, that was previously send via POST.
