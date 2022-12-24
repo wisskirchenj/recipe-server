@@ -20,17 +20,25 @@ class RecipeRepositoryTest {
 
     @Test
     void whenSetRecipe_GetReturnsValue() {
-        assertEquals(test, repository.save(test));
-        assertEquals(test, repository.get());
+        var saved = repository.save(test);
+        assertEquals(test.getName(), saved.getName());
+        assertEquals(test.getDescription(), saved.getDescription());
+        assertEquals(test.getIngredients(), saved.getIngredients());
+        assertEquals(test.getDirections(), saved.getDirections());
+        assertEquals(saved, repository.findById(saved.getId()).orElseThrow());
     }
 
 
     @Test
     void whenSetRecipeWithOtherValue_GetReturnsOtherValue() {
-        assertEquals(test, repository.save(test));
-        assertEquals(test, repository.get());
+        Recipe first = new Recipe().setName("first");
+        var saved = repository.save(first);
+        assertEquals(first.getName(), saved.getName());
+        assertEquals(saved, repository.findById(saved.getId()).orElseThrow());
         Recipe other = new Recipe().setName("other");
-        repository.save(other);
-        assertEquals(other, repository.get());
+        var otherSaved = repository.save(other);
+        assertEquals(other.getName(), otherSaved.getName());
+        assertEquals(otherSaved, repository.findById(otherSaved.getId()).orElseThrow());
+        assertTrue(otherSaved.getId() > saved.getId());
     }
 }

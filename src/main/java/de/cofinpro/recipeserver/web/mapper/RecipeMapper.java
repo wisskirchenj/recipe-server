@@ -4,6 +4,9 @@ import de.cofinpro.recipeserver.entities.Recipe;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import org.springframework.stereotype.Component;
 
+/**
+ * Manually implemented entity <-> dto mapper.
+ */
 @Component
 public class RecipeMapper {
 

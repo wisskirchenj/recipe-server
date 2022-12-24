@@ -25,16 +25,16 @@ We create a multi-user web service with Spring Boot that allows storing, retriev
 
 Currently implemented endpoints:
 
-> <b>POST /api/recipe (unauthenticated)</b>. -> post a recipe as Json to stores it server-side.
+> <b>POST /api/recipe/new (unauthenticated)</b>. -> post a recipe as Json to stores it server-side.
 The request JSON looks as:<pre>
 {
     "name": "apple pie",
     "description": "easy apple pie",
     "ingredients": "100 g sugar, 200 g butter, 5 apples",
     "directions": "make dough, put in oven and bake"
-}</pre>
+}</pre> It returns the id in the store as key-value object.
 
-> <b>GET /api/recipe (unauthenticated)</b>. -> receives a recipe that was previously send via POST.
+> <b>GET /api/recipe/{id} (unauthenticated)</b>. -> receives recipe with id, that was previously send via POST.
 
 ## Project completion
 
@@ -50,3 +50,7 @@ Sources for all project tasks (5 stages) with tests and configurations.
 
 23.12.22 Stage 1 completed. Post and get endpoint /api/recipe/ with full test coverage. Setup of typical Rest-Service
 package structure with mapping of Dto <-> entities
+
+24.12.22 Stage 2 completed. Now recipes posted are added in a list strting with id=1. The get method needs a
+path variable containing the id. 404 is returned if the requested element does not exist or 400 in case the path variable 
+is not in integer format.

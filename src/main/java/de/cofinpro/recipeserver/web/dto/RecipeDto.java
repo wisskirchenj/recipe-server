@@ -1,4 +1,12 @@
 package de.cofinpro.recipeserver.web.dto;
 
-public record RecipeDto(String name, String description, String ingredients, String directions) {
-}
+import java.util.List;
+
+/**
+ * immutable DTO carrier for recipes in REST - endpoints
+ */
+public record RecipeDto(String name,
+                        String description,
+                        List<String> ingredients,
+                        List<String> directions
+) { }

@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Map;
+
 import static org.springframework.http.ResponseEntity.*;
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/recipe")
 public class RecipeController {
 
     private final RecipeService service;
@@ -24,14 +27,14 @@ public class RecipeController {
         this.mapper = mapper;
     }
 
-    @GetMapping("recipe")
-    public ResponseEntity<RecipeDto> getRecipe() {
-        return ok(mapper.toDto(service.getRecipe()));
+    @GetMapping("{id}")
+    public ResponseEntity<RecipeDto> getRecipe(@PathVariable long id) {
+        return ok(mapper.toDto(service.getById(id)));
     }
 
-    @PostMapping("recipe")
-    public ResponseEntity<Void> setRecipe(@Valid @RequestBody RecipeDto recipeDto) {
-        service.setRecipe(mapper.toEntity(recipeDto));
-        return ok().build();
+    @PostMapping("new")
+    public ResponseEntity<Map<String, Long>> setRecipe(@Valid @RequestBody RecipeDto recipeDto) {
+        var saved = service.add(mapper.toEntity(recipeDto));
+        return ok(Collections.singletonMap("id", saved.getId()));
     }
 }

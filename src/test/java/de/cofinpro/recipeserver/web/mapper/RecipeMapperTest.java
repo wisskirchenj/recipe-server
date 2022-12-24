@@ -5,6 +5,8 @@ import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecipeMapperTest {
@@ -17,8 +19,9 @@ class RecipeMapperTest {
     @BeforeEach
     void setup() {
         mapper = new RecipeMapper();
-        recipe = new Recipe().setName("n1").setDescription("d1").setIngredients("i1").setDirections("D1");
-        recipeDto = new RecipeDto("n2", "d2", "i2", "D2");
+        recipe = new Recipe().setName("n1").setDescription("d1")
+                .setIngredients(List.of("i1")).setDirections(List.of("D1"));
+        recipeDto = new RecipeDto("n2", "d2", List.of("i2"), List.of("D2"));
     }
 
     @Test
