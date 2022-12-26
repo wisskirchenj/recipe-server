@@ -17,20 +17,25 @@ public class RecipeServiceImpl implements RecipeService {
         this.repository = repository;
     }
 
-    /**
-     * find and retrieve recipe with given id
-     * @return the found recipe
-     * @throws RecipeNotFoundException if no recipe with id is found
-     */
     @Override
     public Recipe getById(long id) throws RecipeNotFoundException {
         return repository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("recipe with id %s not found"
+                .orElseThrow(() -> new RecipeNotFoundException("recipe with id %d not found"
                         .formatted(id)));
     }
 
     @Override
     public Recipe add(Recipe recipe) {
         return repository.save(recipe);
+    }
+
+    @Override
+    public void delete(long id) throws RecipeNotFoundException {
+        repository.findById(id)
+                .ifPresentOrElse(repository::delete,
+                        () -> {
+                            throw new RecipeNotFoundException("recipe with id %d not found"
+                                    .formatted(id));
+                        });
     }
 }

@@ -3,8 +3,7 @@
 Implemented in the <b>Spring Security for Java Backend Developer</b> Track of hyperskill.org's JetBrain Academy.<br>
 https://hyperskill.org/projects/180
 
-Project goal (or rather my interpretation of it) is to implement a Spring boot recipe application with Spring Security
-and persisting into an H2 database.
+Project goal is to implement a Spring boot recipe application with Spring Security and persisting into an H2 database.
 
 ## Technology / External Libraries
 
@@ -51,6 +50,9 @@ Sources for all project tasks (5 stages) with tests and configurations.
 23.12.22 Stage 1 completed. Post and get endpoint /api/recipe/ with full test coverage. Setup of typical Rest-Service
 package structure with mapping of Dto <-> entities
 
-24.12.22 Stage 2 completed. Now recipes posted are added in a list strting with id=1. The get method needs a
+24.12.22 Stage 2 completed. Now recipes posted are added in a list starting with id=1. The get method needs a
 path variable containing the id. 404 is returned if the requested element does not exist or 400 in case the path variable 
 is not in integer format.
+
+26.12.22 Stage 3 completed. Now recipes posted are persisted in a H2 database. Also hibernate validation is performed
+on input - tested with a new fancy generic and record-capable JpaUnitTestValidator. A delete endpoint is added.

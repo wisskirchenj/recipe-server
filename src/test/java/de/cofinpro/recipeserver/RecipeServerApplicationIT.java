@@ -3,6 +3,7 @@ package de.cofinpro.recipeserver;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cofinpro.recipeserver.entities.Recipe;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,13 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +38,15 @@ class RecipeServerApplicationIT {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    @BeforeAll
+    static void cleanDB() {
+        try {
+            Files.deleteIfExists(Path.of("./src/test/resources/recipes_db.mv.db"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     void contextLoads() {
         assertNotNull(webApplicationContext.getBean("recipeController"));
@@ -42,7 +54,8 @@ class RecipeServerApplicationIT {
 
     @Test
     void whenPostRecipe_OkReturned() throws Exception {
-        Recipe recipe = new Recipe();
+        Recipe recipe = new Recipe().setName("n").setDescription("d").setIngredients(List.of("i"))
+                .setDirections(List.of("dir"));
         mockMvc.perform(post("/api/recipe/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(recipe)))
@@ -75,7 +88,8 @@ class RecipeServerApplicationIT {
 
     @Test
     void whenPostAndGetRecipe_OkReturnedWithRecipe() throws Exception {
-        Recipe recipe = new Recipe().setName("name").setIngredients(List.of("sth"));
+        Recipe recipe = new Recipe().setName("name").setDescription("descr").setIngredients(List.of("sth"))
+                .setDirections(List.of("do it"));
         String recipeJson = objectMapper.writeValueAsString(recipe);
         System.out.println(recipeJson);
         var postResult = mockMvc.perform(post("/api/recipe/new")
@@ -91,6 +105,20 @@ class RecipeServerApplicationIT {
                 .andExpect(content().json(recipeJson))
                 .andReturn();
         System.out.println(getResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    void whenDeleteRecipe_204ReturnedIfExists404Else() throws Exception {
+        Recipe recipe = new Recipe().setName("n").setDescription("d").setIngredients(List.of("i"))
+                .setDirections(List.of("dir"));
+        mockMvc.perform(post("/api/recipe/new")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(recipe)))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/recipe/1"))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/recipe/1"))
+                .andExpect(status().isNotFound());
     }
 
 }
