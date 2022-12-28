@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cofinpro.recipeserver.entities.Recipe;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,13 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,15 +34,6 @@ class RecipeServerApplicationIT {
     MockMvc mockMvc;
 
     ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeAll
-    static void cleanDB() {
-        try {
-            Files.deleteIfExists(Path.of("./src/test/resources/recipes_db.mv.db"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     void contextLoads() {
@@ -92,15 +79,7 @@ class RecipeServerApplicationIT {
         Recipe recipe = new Recipe().setName("name").setCategory("test").setDescription("descr").setIngredients(List.of("sth"))
                 .setDirections(List.of("do it"));
         String recipeJson = objectMapper.writeValueAsString(recipe);
-        System.out.println(recipeJson);
-        var postResult = mockMvc.perform(post("/api/recipe/new")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(recipeJson))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("id\":")))
-                .andReturn();
-        var postId = objectMapper.readValue(postResult.getResponse().getContentAsString(),
-                new TypeReference<Map<String, Long>>(){}).get("id");
+        long postId = postNew(recipeJson);
         var getResult = mockMvc.perform(get("/api/recipe/" + postId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(recipeJson))
@@ -112,13 +91,7 @@ class RecipeServerApplicationIT {
     void whenPutRecipe_204ReturnedIfExists404Or400Else() throws Exception {
         Recipe recipe = new Recipe().setName("name").setCategory("test").setDescription("descr").setIngredients(List.of("sth"))
                 .setDirections(List.of("do it"));
-        String recipeJson = objectMapper.writeValueAsString(recipe);
-        var postResult = mockMvc.perform(post("/api/recipe/new")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(recipeJson))
-                .andReturn();
-        var postId = objectMapper.readValue(postResult.getResponse().getContentAsString(),
-                new TypeReference<Map<String, Long>>(){}).get("id");
+        long postId = postNew(objectMapper.writeValueAsString(recipe));
         var recipeDto = new RecipeDto("n", "c", null, "d",
                 List.of("i"), List.of("D"));
         mockMvc.perform(put("/api/recipe/" + postId)
@@ -141,13 +114,10 @@ class RecipeServerApplicationIT {
     void whenDeleteRecipe_204ReturnedIfExists404Else() throws Exception {
         Recipe recipe = new Recipe().setName("n").setCategory("z").setDescription("d").setIngredients(List.of("i"))
                 .setDirections(List.of("dir"));
-        mockMvc.perform(post("/api/recipe/new")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(recipe)))
-                .andExpect(status().isOk());
-        mockMvc.perform(delete("/api/recipe/1"))
+        long postId = postNew(objectMapper.writeValueAsString(recipe));
+        mockMvc.perform(delete("/api/recipe/" + postId))
                 .andExpect(status().isNoContent());
-        mockMvc.perform(delete("/api/recipe/1"))
+        mockMvc.perform(delete("/api/recipe/" + postId))
                 .andExpect(status().isNotFound());
     }
 
@@ -179,5 +149,15 @@ class RecipeServerApplicationIT {
     void whenSearchByNoOrTwoParameters_400Returned(String searchPath) throws Exception {
         mockMvc.perform(get("/api/recipe/search/" + searchPath))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    private long postNew(String recipeJson) throws Exception {
+        var postResult = mockMvc.perform(post("/api/recipe/new")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(recipeJson))
+                .andReturn();
+        return objectMapper.readValue(postResult.getResponse().getContentAsString(),
+                new TypeReference<Map<String, Long>>(){}).get("id");
     }
 }
