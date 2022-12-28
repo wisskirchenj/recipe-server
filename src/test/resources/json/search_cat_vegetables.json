@@ -1,0 +1,35 @@
+[
+  {
+    "name": "More Peas",
+    "category": "vegetables",
+    "description": "more delicious peas",
+    "ingredients": [
+      "200g peas"
+    ],
+    "directions": [
+      "cook peas"
+    ]
+  },
+  {
+    "name": "Peas",
+    "category": "vegetables",
+    "description": "delicious peas",
+    "ingredients": [
+      "100g peas"
+    ],
+    "directions": [
+      "cook peas"
+    ]
+  },
+  {
+    "name": "Beans",
+    "category": "vegetables",
+    "description": "delicious beans",
+    "ingredients": [
+      "100g beans"
+    ],
+    "directions": [
+      "cook beans"
+    ]
+  }
+]

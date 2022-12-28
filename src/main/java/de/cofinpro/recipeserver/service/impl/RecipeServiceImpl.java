@@ -7,6 +7,8 @@ import de.cofinpro.recipeserver.web.exception.RecipeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RecipeServiceImpl implements RecipeService {
 
@@ -20,8 +22,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Recipe getById(long id) throws RecipeNotFoundException {
         return repository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("recipe with id %d not found"
-                        .formatted(id)));
+                .orElseThrow(() -> createNotFoundException(id));
     }
 
     @Override
@@ -33,9 +34,29 @@ public class RecipeServiceImpl implements RecipeService {
     public void delete(long id) throws RecipeNotFoundException {
         repository.findById(id)
                 .ifPresentOrElse(repository::delete,
-                        () -> {
-                            throw new RecipeNotFoundException("recipe with id %d not found"
-                                    .formatted(id));
-                        });
+                        () -> { throw createNotFoundException(id); });
+    }
+
+    @Override
+    public void update(long id, Recipe updateRecipe) {
+        repository.findById(id)
+                .ifPresentOrElse(foundRecipe -> {
+                            updateRecipe.setId(foundRecipe.getId());
+                            repository.save(updateRecipe);
+                        }, () -> { throw createNotFoundException(id); });
+    }
+
+    @Override
+    public List<Recipe> searchByCategory(String searchText) {
+        return repository.findAllByCategoryEqualsIgnoreCaseOrderByDateTimeDesc(searchText);
+    }
+
+    @Override
+    public List<Recipe> searchByName(String searchText) {
+        return repository.findAllByNameContainsIgnoreCaseOrderByDateTimeDesc(searchText);
+    }
+
+    private RecipeNotFoundException createNotFoundException(long id) {
+        return new RecipeNotFoundException("recipe with id %d not found".formatted(id));
     }
 }

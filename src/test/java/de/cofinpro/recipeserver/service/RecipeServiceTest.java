@@ -14,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecipeServiceTest {
@@ -50,5 +49,22 @@ class RecipeServiceTest {
         when(recipeRepository.save(test)).thenReturn(test);
         Assertions.assertEquals(test, recipeService.add(test));
         verify(recipeRepository).save(test);
+    }
+
+    @Test
+    void whenInvalidId_DeleteThrows() {
+        when(recipeRepository.findById(2L)).thenReturn(Optional.empty());
+        Assertions.assertThrows(RecipeNotFoundException.class, () -> recipeService.delete(2L));
+        verify(recipeRepository).findById(2L);
+        verify(recipeRepository, never()).delete(any(Recipe.class));
+    }
+
+    @Test
+    void whenInvalidId_PutThrows() {
+        when(recipeRepository.findById(2L)).thenReturn(Optional.empty());
+        var updated = new Recipe();
+        Assertions.assertThrows(RecipeNotFoundException.class, () -> recipeService.update(2L, updated));
+        verify(recipeRepository).findById(2L);
+        verify(recipeRepository, never()).save(any(Recipe.class));
     }
 }

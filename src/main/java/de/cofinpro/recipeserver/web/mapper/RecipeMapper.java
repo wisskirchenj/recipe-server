@@ -11,12 +11,15 @@ import org.springframework.stereotype.Component;
 public class RecipeMapper {
 
     public RecipeDto toDto(Recipe recipe) {
-        return new RecipeDto(recipe.getName(), recipe.getDescription(), recipe.getIngredients(),
-                recipe.getDirections());
+        return new RecipeDto(recipe.getName(), recipe.getCategory(), recipe.getDateTime(),
+                recipe.getDescription(), recipe.getIngredients(), recipe.getDirections());
     }
 
     public Recipe toEntity(RecipeDto recipeDto) {
-        return new Recipe().setName(recipeDto.name()).setDescription(recipeDto.description())
-                .setIngredients(recipeDto.ingredients()).setDirections(recipeDto.directions());
+        return new Recipe().setName(recipeDto.name())
+                .setCategory(recipeDto.category())
+                .setDescription(recipeDto.description())
+                .setIngredients(recipeDto.ingredients())
+                .setDirections(recipeDto.directions());
     }
 }

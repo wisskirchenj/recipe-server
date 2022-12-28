@@ -9,9 +9,10 @@ import jakarta.persistence.GenerationType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -19,7 +20,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Accessors(chain = true)
 @Entity
@@ -29,6 +29,10 @@ public class Recipe {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long id;
     private String name;
+    private String category;
+    @UpdateTimestamp
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDateTime dateTime;
     private String description;
     @ElementCollection
     private List<String> ingredients;

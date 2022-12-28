@@ -24,16 +24,28 @@ We create a multi-user web service with Spring Boot that allows storing, retriev
 
 Currently implemented endpoints:
 
-> <b>POST /api/recipe/new (unauthenticated)</b>. -> post a recipe as Json to stores it server-side.
+> <b>POST /api/recipe/new (unauthenticated)</b>. -> post a recipe as Json to stores it server-side with the timestamp.
 The request JSON looks as:<pre>
 {
     "name": "apple pie",
+    "category": "bakery",
     "description": "easy apple pie",
     "ingredients": ["100 g sugar", "200 g butter", "5 apples"],
     "directions": ["make dough", "put in oven", "bake at 200°"]
 }</pre> It returns the id in the store as key-value object.
 
-> <b>GET /api/recipe/{id} (unauthenticated)</b>. -> receives recipe with id, that was previously send via POST.
+> <b>GET /api/recipe/{id} (unauthenticated)</b>. -> receives recipe with id from the database.
+
+> <b>DELETE /api/recipe/{id} (unauthenticated)</b>. -> delete recipe with id, returns 204.
+
+> <b>PUT /api/recipe/{id} (unauthenticated)</b>. -> receives a recipe as a JSON object and updates the recipe with specified id. 
+Also, updates the date field.
+ 
+> <b>GET /api/recipe/search/?category=search (unauthenticated)</b>.
+> <b>GET /api/recipe/search/?name=search (unauthenticated)</b>. -> retrieve all recipes matching to either a
+case-insensitive category parameter search or a case-insensitive substring search on the name as a Json-array, which
+is sorted descending by update timestamp.
+
 
 ## Project completion
 
@@ -56,3 +68,7 @@ is not in integer format.
 
 26.12.22 Stage 3 completed. Now recipes posted are persisted in a H2 database. Also hibernate validation is performed
 on input - tested with a new fancy generic and record-capable JpaUnitTestValidator. A delete endpoint is added.
+
+27.12.22 Stage 4 completed. Now recipes posted are persisted in a H2 database. Recipe entity gets additional category and
+an @UpdateTimestamp annotated LocalDateTime field. Put endpoint added to update recipe by id and a parameter search
+on category or name substrings with sorting by newest posted/ updated.
