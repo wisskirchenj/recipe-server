@@ -47,7 +47,7 @@ The request JSON looks as:<pre>
 > <b>DELETE /api/recipe/{id} (authenticated)</b>. -> delete recipe with id if the principal is the creator. In this case
 returns 204, if not 403 FORBIDDEN is returned or 404 not Found, if recipe with id does not exist.
 
-> <b>PUT /api/recipe/{id} (unauthenticated)</b>. -> receives a recipe as a JSON object and updates the recipe with specified id
+> <b>PUT /api/recipe/{id} (authenticated)</b>. -> receives a recipe as a JSON object and updates the recipe with specified id
 if the principal is the creator. In this case returns 204, if not 403 FORBIDDEN is returned or 404 not Found, if recipe with id does not exist.
 Also, updates the dateTime field.
  
