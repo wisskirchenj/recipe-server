@@ -1,6 +1,5 @@
-package de.cofinpro.recipeserver;
+package de.cofinpro.recipeserver.web;
 
-import de.cofinpro.recipeserver.web.JpaUnitTestValidator;
 import de.cofinpro.recipeserver.web.dto.UserDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
