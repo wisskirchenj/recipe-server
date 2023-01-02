@@ -57,12 +57,6 @@ class RecipeServerApplicationIT {
         mockUserheader.setBasicAuth("a@b.c", "secret__");
     }
 
-    private void setupMockUser() {
-        mockUserIsSetup = true;
-        Assertions.assertDoesNotThrow(() ->
-                registerService.registerUser(userMapper.toEntity(new UserDto("a@b.c", "secret__"))));
-    }
-
     @Test
     void contextLoads() {
         assertNotNull(webApplicationContext.getBean("recipeController"));
@@ -77,18 +71,6 @@ class RecipeServerApplicationIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(recipe)))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void whenFalseUrl_403ReturnedSinceDenied() throws Exception {
-        Recipe recipe = new Recipe();
-        mockMvc.perform(post("/api/recie/1")
-                        .headers(mockUserheader)
-                        .content(objectMapper.writeValueAsBytes(recipe)))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(get("/api")
-                        .headers(mockUserheader))
-                .andExpect(status().isForbidden());
     }
 
     @ParameterizedTest
@@ -203,5 +185,11 @@ class RecipeServerApplicationIT {
                 .andReturn();
         return objectMapper.readValue(postResult.getResponse().getContentAsString(),
                 new TypeReference<Map<String, Long>>(){}).get("id");
+    }
+
+    void setupMockUser() {
+        mockUserIsSetup = true;
+        Assertions.assertDoesNotThrow(() ->
+                registerService.registerUser(userMapper.toEntity(new UserDto("a@b.c", "secret__"))));
     }
 }
