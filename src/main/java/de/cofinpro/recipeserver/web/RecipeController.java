@@ -1,11 +1,13 @@
 package de.cofinpro.recipeserver.web;
 
+import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.service.RecipeService;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import de.cofinpro.recipeserver.web.mapper.RecipeMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +25,6 @@ import java.util.Optional;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
-
 @RestController
 @RequestMapping("api/recipe")
 public class RecipeController {
@@ -44,13 +45,14 @@ public class RecipeController {
      * @return key-value object "id": id of newly created recipe (database)
      */
     @PostMapping("new")
-    public ResponseEntity<Map<String, Long>> setRecipe(@Valid @RequestBody RecipeDto recipeDto) {
-        var saved = service.add(mapper.toEntity(recipeDto));
+    public ResponseEntity<Map<String, Long>> addRecipe(@Valid @RequestBody RecipeDto recipeDto,
+                                                       @AuthenticationPrincipal User user) {
+        var saved = service.add(mapper.toEntity(recipeDto, user));
         return ok(Collections.singletonMap("id", saved.getId()));
     }
 
     /**
-     * returns the recipe with id given as Json, if it exosts.
+     * returns the recipe with id given as Json, if it exists.
      * @param id the recipe id to find
      * @return RecipeDto with 200 = OK if id is found, 404 else (RecipeNotFoundException).
      */
@@ -81,23 +83,25 @@ public class RecipeController {
     /**
      * deletes the recipe with id given from the database if it exists.
      * @param id the recipe id to delete
-     * @return 204 = NoContent if id is found, 404 else (RecipeNotFoundException).
+     * @return 204 = NoContent if id is found, 403 if not creator, 404 else (RecipeNotFoundException).
      */
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable long id) {
-        service.delete(id);
+    public ResponseEntity<Void> deleteRecipe(@PathVariable long id, @AuthenticationPrincipal User user) {
+        service.delete(id, user.getUsername());
         return noContent().build();
     }
 
     /**
      * deletes the recipe with di given from the database if it exists.
      * @param id the recipe id to delete
-     * @return 204 = NoContent if id is found, 404 else (RecipeNotFoundException).
+     * @return 204 = NoContent if id is found, 403 if not creator, 404 else (RecipeNotFoundException).
      */
     @PutMapping("{id}")
     public ResponseEntity<Void> updateRecipe(@PathVariable long id,
-                                             @Valid @RequestBody RecipeDto recipeDto) {
-        service.update(id, mapper.toEntity(recipeDto));
+                                             @Valid @RequestBody RecipeDto recipeDto,
+                                             @AuthenticationPrincipal User user) {
+        service.update(id, mapper.toEntity(recipeDto, user), user.getUsername());
         return noContent().build();
     }
 }
+

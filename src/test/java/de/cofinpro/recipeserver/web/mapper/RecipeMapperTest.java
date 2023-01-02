@@ -1,6 +1,7 @@
 package de.cofinpro.recipeserver.web.mapper;
 
 import de.cofinpro.recipeserver.entities.Recipe;
+import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,10 +40,13 @@ class RecipeMapperTest {
 
     @Test
     void toEntity() {
-        Recipe mapped = mapper.toEntity(recipeDto);
+        User user = new User().setUsername("test");
+        Recipe mapped = mapper.toEntity(recipeDto, user);
         assertEquals(recipeDto.name(), mapped.getName());
+        assertEquals(recipeDto.category(), mapped.getCategory());
         assertEquals(recipeDto.description(), mapped.getDescription());
         assertEquals(recipeDto.ingredients(), mapped.getIngredients());
         assertEquals(recipeDto.directions(), mapped.getDirections());
+        assertEquals(user, mapped.getCreator());
     }
 }

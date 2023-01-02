@@ -8,7 +8,7 @@ Project goal is to implement a Spring boot recipe application with Spring Securi
 ## Technology / External Libraries
 
 - Java 19
-- Spring Boot 3.0.0
+- Spring Boot 3.0.1 (with Spring 6.0.3 and Spring Security 6.0.1)
 - Spring Web using "classical" WebMvC @RestController-style
 - Spring Data JPA and Validate
 - H2 Database
@@ -24,7 +24,15 @@ We create a multi-user web service with Spring Boot that allows storing, retriev
 
 Currently implemented endpoints:
 
-> <b>POST /api/recipe/new (unauthenticated)</b>. -> post a recipe as Json to persist it server-side with the timestamp.
+> <b>POST /api/register (unauthenticated)</b>. -> post email and password as Json to register. Returns 200 OK on success
+or 400 BAD REQUEST, if invalid Json or User with email already exists.
+The request JSON looks as:<pre>
+{
+"email": "hans.wurst@xyz.de",
+"password": "topsecret",
+}</pre> The password needs 8 characters, email is checked as valid format.
+
+> <b>POST /api/recipe/new (authenticated)</b>. -> post a recipe as Json to persist it server-side with the timestamp and the creator.
 The request JSON looks as:<pre>
 {
     "name": "apple pie",
@@ -34,22 +42,24 @@ The request JSON looks as:<pre>
     "directions": ["make dough", "put in oven", "bake at 200°"]
 }</pre> It returns the id in the database as key-value object.
 
-> <b>GET /api/recipe/{id} (unauthenticated)</b>. -> receives recipe with id from the database.
+> <b>GET /api/recipe/{id} (authenticated)</b>. -> receives recipe with id from the database.
 
-> <b>DELETE /api/recipe/{id} (unauthenticated)</b>. -> delete recipe with id, returns 204.
+> <b>DELETE /api/recipe/{id} (authenticated)</b>. -> delete recipe with id if the principal is the creator. In this case
+returns 204, if not 403 FORBIDDEN is returned or 404 not Found, if recipe with id does not exist.
 
-> <b>PUT /api/recipe/{id} (unauthenticated)</b>. -> receives a recipe as a JSON object and updates the recipe with specified id. 
+> <b>PUT /api/recipe/{id} (unauthenticated)</b>. -> receives a recipe as a JSON object and updates the recipe with specified id
+if the principal is the creator. In this case returns 204, if not 403 FORBIDDEN is returned or 404 not Found, if recipe with id does not exist.
 Also, updates the dateTime field.
  
-> <b>GET /api/recipe/search/?category=search (unauthenticated)</b>.  
-> <b>GET /api/recipe/search/?name=search (unauthenticated)</b>. -> retrieve all recipes matching to either a
+> <b>GET /api/recipe/search/?category=search (authenticated)</b>.  
+> <b>GET /api/recipe/search/?name=search (authenticated)</b>. -> retrieve all recipes matching to either a
 case-insensitive category parameter search or a case-insensitive substring search on the name as a Json-array, which
 is sorted descending by update timestamp.
 
 
 ## Project completion
 
-[# Project was completed on 19.06.22.]: #
+Project was completed on 01.01.23.
 
 ## Repository Contents
 
@@ -72,3 +82,7 @@ on input - tested with a new fancy generic and record-capable JpaUnitTestValidat
 27.12.22 Stage 4 completed. Now recipes posted are persisted in a H2 database. Recipe entity gets additional category and
 an @UpdateTimestamp annotated LocalDateTime field. Put endpoint added to update recipe by id and a parameter search
 on category or name substrings with sorting by newest posted/ updated.
+
+01.01.23 Stage 5 completed. Added Spring security v 6.0 and a register endpoint for users to register. Only registered users
+may access the api/recipe endpoints. Further update / delete actions are only permitted, if the session user is the creator
+of a recipe (creator stored in recipe table).

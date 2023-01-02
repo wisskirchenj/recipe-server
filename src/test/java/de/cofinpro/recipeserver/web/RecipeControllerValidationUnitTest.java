@@ -17,7 +17,7 @@ class RecipeControllerValidationUnitTest {
     JpaUnitTestValidator<RecipeDto> recipeValidator
             = new JpaUnitTestValidator<>(this::getValidRecipeRequest, RecipeDto.class);
 
-    private RecipeDto getValidRecipeRequest() {
+    RecipeDto getValidRecipeRequest() {
         return new RecipeDto("Apple pie",
                 "cake",
                 LocalDateTime.of(2000, 6,15, 22, 0),
@@ -29,11 +29,11 @@ class RecipeControllerValidationUnitTest {
 
     @ParameterizedTest
     @MethodSource
-    void whenValidRecipeDtoNoError(String fieldName, Object validValue) throws Exception {
+    void whenValidRecipeDto_NoError(String fieldName, Object validValue) throws Exception {
         assertTrue(recipeValidator.getConstraintViolationsOnUpdate(fieldName, validValue).isEmpty());
     }
 
-    static Stream<Arguments> whenValidRecipeDtoNoError() {
+    static Stream<Arguments> whenValidRecipeDto_NoError() {
         return Stream.of(
                 Arguments.of("name", " some recipe !"),
                 Arguments.of("name", "Name"),
@@ -54,11 +54,11 @@ class RecipeControllerValidationUnitTest {
 
     @ParameterizedTest
     @MethodSource
-    void whenInvalidRecipeDtoHasOneValidationError(String fieldName, Object invalidValue) throws Exception {
+    void whenInvalidRecipe_DtoHasOneValidationError(String fieldName, Object invalidValue) throws Exception {
         assertEquals(1, recipeValidator.getConstraintViolationsOnUpdate(fieldName, invalidValue).size());
     }
 
-    static Stream<Arguments> whenInvalidRecipeDtoHasOneValidationError() {
+    static Stream<Arguments> whenInvalidRecipe_DtoHasOneValidationError() {
         return Stream.of(
                 Arguments.of("name", "   "),
                 Arguments.of("name", ""),

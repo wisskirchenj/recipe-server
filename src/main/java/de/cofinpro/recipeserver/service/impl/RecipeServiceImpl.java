@@ -3,12 +3,17 @@ package de.cofinpro.recipeserver.service.impl;
 import de.cofinpro.recipeserver.entities.Recipe;
 import de.cofinpro.recipeserver.repository.RecipeRepository;
 import de.cofinpro.recipeserver.service.RecipeService;
+import de.cofinpro.recipeserver.web.exception.NotOwnerException;
 import de.cofinpro.recipeserver.web.exception.RecipeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
+/**
+ * service layer class for serving "api/recipe" endpoints
+ */
 @Service
 public class RecipeServiceImpl implements RecipeService {
 
@@ -21,29 +26,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Recipe getById(long id) throws RecipeNotFoundException {
-        return repository.findById(id)
-                .orElseThrow(() -> createNotFoundException(id));
-    }
-
-    @Override
-    public Recipe add(Recipe recipe) {
-        return repository.save(recipe);
-    }
-
-    @Override
-    public void delete(long id) throws RecipeNotFoundException {
-        repository.findById(id)
-                .ifPresentOrElse(repository::delete,
-                        () -> { throw createNotFoundException(id); });
-    }
-
-    @Override
-    public void update(long id, Recipe updateRecipe) {
-        repository.findById(id)
-                .ifPresentOrElse(foundRecipe -> {
-                            updateRecipe.setId(foundRecipe.getId());
-                            repository.save(updateRecipe);
-                        }, () -> { throw createNotFoundException(id); });
+        return repository.findById(id).orElseThrow(() -> createNotFoundException(id));
     }
 
     @Override
@@ -54,6 +37,42 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public List<Recipe> searchByName(String searchText) {
         return repository.findAllByNameContainsIgnoreCaseOrderByDateTimeDesc(searchText);
+    }
+
+    @Override
+    public Recipe add(Recipe recipe) {
+        return repository.save(recipe);
+    }
+
+    @Override
+    public void delete(long id, String username) throws RecipeNotFoundException, NotOwnerException {
+        repository.findById(id)
+                .ifPresentOrElse(recipe -> executeIfOwnerOrThrow(recipe, repository::delete, username),
+                        () -> { throw createNotFoundException(id); });
+    }
+
+    @Override
+    public void update(long id, Recipe updateRecipe, String username)
+            throws RecipeNotFoundException, NotOwnerException  {
+        repository.findById(id)
+                .ifPresentOrElse(recipe -> executeIfOwnerOrThrow(recipe, getUpdateAction(updateRecipe), username),
+                        () -> { throw createNotFoundException(id); });
+    }
+
+    private Consumer<Recipe> getUpdateAction(Recipe updateRecipe) {
+        return recipe -> {
+            updateRecipe.setId(recipe.getId());
+            repository.save(updateRecipe);
+        };
+    }
+
+    private void executeIfOwnerOrThrow(Recipe recipe, Consumer<Recipe> action, String username)
+            throws NotOwnerException {
+        if (recipe.getCreator().getUsername().equals(username)) {
+            action.accept(recipe);
+        } else {
+            throw new NotOwnerException();
+        }
     }
 
     private RecipeNotFoundException createNotFoundException(long id) {

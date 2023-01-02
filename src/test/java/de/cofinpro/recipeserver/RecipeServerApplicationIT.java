@@ -3,7 +3,12 @@ package de.cofinpro.recipeserver;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cofinpro.recipeserver.entities.Recipe;
+import de.cofinpro.recipeserver.service.RegisterService;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
+import de.cofinpro.recipeserver.web.dto.UserDto;
+import de.cofinpro.recipeserver.web.mapper.UserMapper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -11,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -24,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest
+@SpringBootTest(properties = { "spring.datasource.url=jdbc:h2:file:./src/test/resources/test_recipes_db"})
 @AutoConfigureMockMvc
 class RecipeServerApplicationIT {
 
@@ -32,8 +38,30 @@ class RecipeServerApplicationIT {
     WebApplicationContext webApplicationContext;
     @Autowired
     MockMvc mockMvc;
+    @Autowired
+    RegisterService registerService;
+    @Autowired
+    UserMapper userMapper;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
+    HttpHeaders mockUserheader;
+    static boolean mockUserIsSetup = false;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        if (!mockUserIsSetup) {
+            setupMockUser();
+        }
+        mockUserheader = new HttpHeaders();
+        mockUserheader.setBasicAuth("a@b.c", "secret__");
+    }
+
+    private void setupMockUser() {
+        mockUserIsSetup = true;
+        Assertions.assertDoesNotThrow(() ->
+                registerService.registerUser(userMapper.toEntity(new UserDto("a@b.c", "secret__"))));
+    }
 
     @Test
     void contextLoads() {
@@ -45,32 +73,37 @@ class RecipeServerApplicationIT {
         Recipe recipe = new Recipe().setName("n").setCategory("z").setDescription("d").setIngredients(List.of("i"))
                 .setDirections(List.of("dir"));
         mockMvc.perform(post("/api/recipe/new")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(recipe)))
+                        .headers(mockUserheader)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(recipe)))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void whenFalseUrl_404Returned() throws Exception {
+    void whenFalseUrl_403ReturnedSinceDenied() throws Exception {
         Recipe recipe = new Recipe();
-        mockMvc.perform(post("/api/recipe")
+        mockMvc.perform(post("/api/recie/1")
+                        .headers(mockUserheader)
                         .content(objectMapper.writeValueAsBytes(recipe)))
-                .andExpect(status().isNotFound());
-        mockMvc.perform(get("/api"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api")
+                        .headers(mockUserheader))
+                .andExpect(status().isForbidden());
     }
 
     @ParameterizedTest
     @ValueSource(longs = {77, 0 , -22})
     void whenGetWithNonExistingRecipeId_404Returned(long id) throws Exception {
-        mockMvc.perform(get("/api/recipe/" + id))
+        mockMvc.perform(get("/api/recipe/" + id)
+                        .headers(mockUserheader))
                 .andExpect(status().isNotFound());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"eins", "2.0", "3l", ".9"})
     void whenGetWithInvalidFormatRecipeId_400Returned(String pathVar) throws Exception {
-        mockMvc.perform(get("/api/recipe/" + pathVar))
+        mockMvc.perform(get("/api/recipe/" + pathVar)
+                        .headers(mockUserheader))
                 .andExpect(status().isBadRequest());
     }
 
@@ -80,7 +113,8 @@ class RecipeServerApplicationIT {
                 .setDirections(List.of("do it"));
         String recipeJson = objectMapper.writeValueAsString(recipe);
         long postId = postNew(recipeJson);
-        var getResult = mockMvc.perform(get("/api/recipe/" + postId))
+        var getResult = mockMvc.perform(get("/api/recipe/" + postId)
+                        .headers(mockUserheader))
                 .andExpect(status().isOk())
                 .andExpect(content().json(recipeJson))
                 .andReturn();
@@ -95,16 +129,19 @@ class RecipeServerApplicationIT {
         var recipeDto = new RecipeDto("n", "c", null, "d",
                 List.of("i"), List.of("D"));
         mockMvc.perform(put("/api/recipe/" + postId)
+                .headers(mockUserheader)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recipeDto))
-                ).andExpect(status().isNoContent());
+        ).andExpect(status().isNoContent());
         mockMvc.perform(put("/api/recipe/77")
+                .headers(mockUserheader)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recipeDto))
         ).andExpect(status().isNotFound());
         recipeDto = new RecipeDto("n", " ", null, "d",
                 List.of("i"), List.of("D"));
         mockMvc.perform(put("/api/recipe/" + postId)
+                .headers(mockUserheader)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recipeDto))
         ).andExpect(status().isBadRequest());
@@ -115,9 +152,11 @@ class RecipeServerApplicationIT {
         Recipe recipe = new Recipe().setName("n").setCategory("z").setDescription("d").setIngredients(List.of("i"))
                 .setDirections(List.of("dir"));
         long postId = postNew(objectMapper.writeValueAsString(recipe));
-        mockMvc.perform(delete("/api/recipe/" + postId))
+        mockMvc.perform(delete("/api/recipe/" + postId)
+                        .headers(mockUserheader))
                 .andExpect(status().isNoContent());
-        mockMvc.perform(delete("/api/recipe/" + postId))
+        mockMvc.perform(delete("/api/recipe/" + postId)
+                        .headers(mockUserheader))
                 .andExpect(status().isNotFound());
     }
 
@@ -129,17 +168,20 @@ class RecipeServerApplicationIT {
         );
         for (var recipe: testRecipes) {
             mockMvc.perform(post("/api/recipe/new")
+                    .headers(mockUserheader)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(recipe)));
         }
         var expectedCategorySearchResult = Files.readString(
                 new ClassPathResource("json/search_cat_vegetables.json").getFile().toPath());
-        mockMvc.perform(get("/api/recipe/search/?category=VEGETABLES"))
+        mockMvc.perform(get("/api/recipe/search/?category=VEGETABLES")
+                        .headers(mockUserheader))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedCategorySearchResult));
         var expectedNameSearchResult = Files.readString(
                 new ClassPathResource("json/search_name_EAS.json").getFile().toPath());
-        mockMvc.perform(get("/api/recipe/search/?name=EaS"))
+        mockMvc.perform(get("/api/recipe/search/?name=EaS")
+                        .headers(mockUserheader))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedNameSearchResult));
     }
@@ -147,13 +189,15 @@ class RecipeServerApplicationIT {
     @ParameterizedTest
     @ValueSource(strings = {"?categor=VEGETABLES", "?category=VEGETABLES&name=as", ""})
     void whenSearchByNoOrTwoParameters_400Returned(String searchPath) throws Exception {
-        mockMvc.perform(get("/api/recipe/search/" + searchPath))
+        mockMvc.perform(get("/api/recipe/search/" + searchPath)
+                        .headers(mockUserheader))
                 .andExpect(status().isBadRequest());
     }
 
 
     private long postNew(String recipeJson) throws Exception {
         var postResult = mockMvc.perform(post("/api/recipe/new")
+                        .headers(mockUserheader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(recipeJson))
                 .andReturn();

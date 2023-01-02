@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * immutable DTO carrier for recipes in REST - endpoints
+ * immutable web-layer DTO as carrier for recipes in REST - endpoints
  */
 public record RecipeDto(@NotBlank String name,
                         @NotBlank String category,

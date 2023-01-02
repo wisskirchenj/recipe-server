@@ -1,6 +1,7 @@
 package de.cofinpro.recipeserver.web.mapper;
 
 import de.cofinpro.recipeserver.entities.Recipe;
+import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +16,12 @@ public class RecipeMapper {
                 recipe.getDescription(), recipe.getIngredients(), recipe.getDirections());
     }
 
-    public Recipe toEntity(RecipeDto recipeDto) {
+    public Recipe toEntity(RecipeDto recipeDto, User user) {
         return new Recipe().setName(recipeDto.name())
                 .setCategory(recipeDto.category())
                 .setDescription(recipeDto.description())
                 .setIngredients(recipeDto.ingredients())
-                .setDirections(recipeDto.directions());
+                .setDirections(recipeDto.directions())
+                .setCreator(user);
     }
 }
