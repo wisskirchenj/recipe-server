@@ -1,4 +1,4 @@
-# IDEA EDU Course ...
+# IDEA EDU Course
 
 Implemented in the <b>Spring Security for Java Backend Developer</b> Track of hyperskill.org's JetBrain Academy.<br>
 https://hyperskill.org/projects/180
