@@ -33,7 +33,7 @@ public class RegisterController {
      * @return empty response 200(OK) on successful register, 400(BadRequest) if dto validation fails or user exists
      */
     @PostMapping
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody UserDto userDto) {
+    ResponseEntity<Void> registerUser(@Valid @RequestBody UserDto userDto) {
         service.registerUser(mapper.toEntity(userDto));
         return ok().build();
     }

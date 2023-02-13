@@ -45,7 +45,7 @@ public class RecipeController {
      * @return key-value object "id": id of newly created recipe (database)
      */
     @PostMapping("new")
-    public ResponseEntity<Map<String, Long>> addRecipe(@Valid @RequestBody RecipeDto recipeDto,
+    ResponseEntity<Map<String, Long>> addRecipe(@Valid @RequestBody RecipeDto recipeDto,
                                                        @AuthenticationPrincipal User user) {
         var saved = service.add(mapper.toEntity(recipeDto, user));
         return ok(Collections.singletonMap("id", saved.getId()));
@@ -57,7 +57,7 @@ public class RecipeController {
      * @return RecipeDto with 200 = OK if id is found, 404 else (RecipeNotFoundException).
      */
     @GetMapping("{id}")
-    public ResponseEntity<RecipeDto> getRecipe(@PathVariable long id) {
+    ResponseEntity<RecipeDto> getRecipe(@PathVariable long id) {
         return ok(mapper.toDto(service.getById(id)));
     }
 
@@ -68,7 +68,7 @@ public class RecipeController {
      * @return 200 with found Recipe[] or empty if no match, 400 if not exactly one of the given parameters is provided.
      */
     @GetMapping("search/")
-    public ResponseEntity<RecipeDto[]> searchRecipes(@RequestParam Optional<String> category,
+    ResponseEntity<RecipeDto[]> searchRecipes(@RequestParam Optional<String> category,
                                                      @RequestParam Optional<String> name) {
         if (category.isEmpty() == name.isEmpty()) {
             return badRequest().build();
@@ -86,7 +86,7 @@ public class RecipeController {
      * @return 204 = NoContent if id is found, 403 if not creator, 404 else (RecipeNotFoundException).
      */
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable long id, @AuthenticationPrincipal User user) {
+    ResponseEntity<Void> deleteRecipe(@PathVariable long id, @AuthenticationPrincipal User user) {
         service.delete(id, user.getUsername());
         return noContent().build();
     }
@@ -97,7 +97,7 @@ public class RecipeController {
      * @return 204 = NoContent if id is found, 403 if not creator, 404 else (RecipeNotFoundException).
      */
     @PutMapping("{id}")
-    public ResponseEntity<Void> updateRecipe(@PathVariable long id,
+    ResponseEntity<Void> updateRecipe(@PathVariable long id,
                                              @Valid @RequestBody RecipeDto recipeDto,
                                              @AuthenticationPrincipal User user) {
         service.update(id, mapper.toEntity(recipeDto, user), user.getUsername());
