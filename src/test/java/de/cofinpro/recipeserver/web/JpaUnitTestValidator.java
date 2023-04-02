@@ -18,8 +18,8 @@ public class JpaUnitTestValidator<T> {
     private Constructor<? extends T> recordConstructor;
 
     public JpaUnitTestValidator(Supplier<? extends T> getValidObjectFunction, Class<? extends T> dtoClass) {
-        try (var validation = Validation.buildDefaultValidatorFactory()) {
-            this.validator = validation.getValidator();
+        try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = validatorFactory.getValidator();
         }
         this.getValidFunction = getValidObjectFunction;
         initRecordConstructorIfNeeded(dtoClass);

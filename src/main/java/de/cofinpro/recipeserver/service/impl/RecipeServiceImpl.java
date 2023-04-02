@@ -46,16 +46,18 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void delete(long id, String username) throws RecipeNotFoundException, NotOwnerException {
-        repository.findById(id)
-                .ifPresentOrElse(recipe -> executeIfOwnerOrThrow(recipe, repository::delete, username),
-                        () -> { throw createNotFoundException(id); });
+        handleCrudAction(id, username, repository::delete);
     }
 
     @Override
     public void update(long id, Recipe updateRecipe, String username)
             throws RecipeNotFoundException, NotOwnerException  {
+        handleCrudAction(id, username, getUpdateAction(updateRecipe));
+    }
+
+    private void handleCrudAction(long id, String username, Consumer<Recipe> crudAction) {
         repository.findById(id)
-                .ifPresentOrElse(recipe -> executeIfOwnerOrThrow(recipe, getUpdateAction(updateRecipe), username),
+                .ifPresentOrElse(recipe -> executeIfOwnerOrThrow(recipe, crudAction, username),
                         () -> { throw createNotFoundException(id); });
     }
 
