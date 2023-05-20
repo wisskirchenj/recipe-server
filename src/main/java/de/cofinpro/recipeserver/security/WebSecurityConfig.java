@@ -5,8 +5,10 @@ import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,18 +36,17 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .httpBasic()
-                .and()
-                .authorizeHttpRequests()
-                // next line needed (esp. DispatcherType.ERROR) to prevent interception of AuthorizationFilter in
-                // case of validation or UserExistsError and returning 401 (see https://stackoverflow.com/questions/74971183/)
-                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/register", "/actuator/shutdown").permitAll()
-                .requestMatchers(HttpMethod.GET, "/error").permitAll()
-                .requestMatchers("/api/recipe/**").authenticated()
-                .anyRequest().denyAll();
-        return http.build();
+        return http
+                .csrf(CsrfConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                        // next line needed (esp. DispatcherType.ERROR) to prevent interception of AuthorizationFilter in
+                        // case of validation or UserExistsError and returning 401 (see https://stackoverflow.com/questions/74971183/)
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/register", "/actuator/shutdown").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/error").permitAll()
+                        .requestMatchers("/api/recipe/**").authenticated()
+                        .anyRequest().denyAll())
+                .build();
     }
 }
