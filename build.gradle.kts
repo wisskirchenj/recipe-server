@@ -23,14 +23,9 @@ repositories {
     }
 }
 
-//extra["hibernate.version"] = "6.1.7.Final"
+extra["hibernate.version"] = "6.1.7.Final"
 
 dependencies {
-    implementation("org.springframework:spring-core") {
-        version {
-            strictly("6.0.10-SNAPSHOT")
-        }
-    }
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
