@@ -1,7 +1,6 @@
 package de.cofinpro.recipeserver.service;
 
 import de.cofinpro.recipeserver.entities.Recipe;
-import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.repository.RecipeRepository;
 import de.cofinpro.recipeserver.service.exception.NotOwnerException;
 import de.cofinpro.recipeserver.service.exception.RecipeNotFoundException;
@@ -73,7 +72,7 @@ class RecipeServiceTest {
     @Test
     void whenNotOwner_DeleteThrowsNotOwner() {
         when(recipeRepository.findById(2L))
-                .thenReturn(Optional.of(new Recipe().setCreator(new User().setUsername("owner"))));
+                .thenReturn(Optional.of(new Recipe().setCreator("owner")));
         Assertions.assertThrows(NotOwnerException.class, () -> recipeService.delete(2L, "other"));
         verify(recipeRepository).findById(2L);
         verify(recipeRepository, never()).delete(any(Recipe.class));
@@ -81,7 +80,7 @@ class RecipeServiceTest {
 
     @Test
     void whenOwner_DeleteDeletes() {
-        var recipe = new Recipe().setCreator(new User().setUsername("owner"));
+        var recipe = new Recipe().setCreator("owner");
         when(recipeRepository.findById(2L)).thenReturn(Optional.of(recipe));
         recipeService.delete(2L, "owner");
         verify(recipeRepository).delete(recipe);
@@ -90,7 +89,7 @@ class RecipeServiceTest {
     @Test
     void whenNotOwner_UpdateThrowsNotOwner() {
         when(recipeRepository.findById(2L))
-                .thenReturn(Optional.of(new Recipe().setCreator(new User().setUsername("owner"))));
+                .thenReturn(Optional.of(new Recipe().setCreator("owner")));
         Assertions.assertThrows(NotOwnerException.class, () -> recipeService.update(2L, null,"other"));
         verify(recipeRepository).findById(2L);
         verify(recipeRepository, never()).save(any(Recipe.class));
@@ -98,7 +97,7 @@ class RecipeServiceTest {
 
     @Test
     void whenOwner_UpdateUpdates() {
-        var recipe = new Recipe().setCreator(new User().setUsername("owner"));
+        var recipe = new Recipe().setCreator("owner");
         when(recipeRepository.findById(2L)).thenReturn(Optional.of(recipe));
         recipeService.update(2L, recipe.setCategory("cat"), "owner");
         verify(recipeRepository).save(recipe);

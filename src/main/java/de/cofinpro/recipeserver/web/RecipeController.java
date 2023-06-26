@@ -1,6 +1,5 @@
 package de.cofinpro.recipeserver.web;
 
-import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.service.RecipeService;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import de.cofinpro.recipeserver.web.mapper.RecipeMapper;
@@ -8,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,8 +46,8 @@ public class RecipeController {
      */
     @PostMapping("new")
     ResponseEntity<Map<String, Long>> addRecipe(@Valid @RequestBody RecipeDto recipeDto,
-                                                       @AuthenticationPrincipal User user) {
-        var saved = service.add(mapper.toEntity(recipeDto, user));
+                                                       @AuthenticationPrincipal Jwt jwt) {
+        var saved = service.add(mapper.toEntity(recipeDto, jwt.getSubject()));
         return ok(Collections.singletonMap("id", saved.getId()));
     }
 
@@ -86,8 +86,8 @@ public class RecipeController {
      * @return 204 = NoContent if id is found, 403 if not creator, 404 else (RecipeNotFoundException).
      */
     @DeleteMapping("{id}")
-    ResponseEntity<Void> deleteRecipe(@PathVariable long id, @AuthenticationPrincipal User user) {
-        service.delete(id, user.getUsername());
+    ResponseEntity<Void> deleteRecipe(@PathVariable long id, @AuthenticationPrincipal Jwt jwt) {
+        service.delete(id, jwt.getSubject());
         return noContent().build();
     }
 
@@ -99,9 +99,8 @@ public class RecipeController {
     @PutMapping("{id}")
     ResponseEntity<Void> updateRecipe(@PathVariable long id,
                                              @Valid @RequestBody RecipeDto recipeDto,
-                                             @AuthenticationPrincipal User user) {
-        service.update(id, mapper.toEntity(recipeDto, user), user.getUsername());
+                                             @AuthenticationPrincipal Jwt jwt) {
+        service.update(id, mapper.toEntity(recipeDto, jwt.getSubject()), jwt.getSubject());
         return noContent().build();
     }
 }
-

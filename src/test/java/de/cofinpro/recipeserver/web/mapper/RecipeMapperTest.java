@@ -40,7 +40,7 @@ class RecipeMapperTest {
 
     @Test
     void toEntity() {
-        User user = new User().setUsername("test");
+        var user = "test";
         Recipe mapped = mapper.toEntity(recipeDto, user);
         assertEquals(recipeDto.name(), mapped.getName());
         assertEquals(recipeDto.category(), mapped.getCategory());

@@ -70,7 +70,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     private void executeIfOwnerOrThrow(Recipe recipe, Consumer<Recipe> action, String username)
             throws NotOwnerException {
-        if (recipe.getCreator().getUsername().equals(username)) {
+        if (recipe.getCreator().equals(username)) {
             action.accept(recipe);
         } else {
             throw new NotOwnerException();

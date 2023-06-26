@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -42,7 +41,5 @@ public class Recipe {
     private List<String> ingredients;
     @ElementCollection
     private List<String> directions;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @ManyToOne(optional = false)
-    private User creator;
+    private String creator;
 }
