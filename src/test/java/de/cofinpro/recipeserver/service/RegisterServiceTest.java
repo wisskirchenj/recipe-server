@@ -3,7 +3,7 @@ package de.cofinpro.recipeserver.service;
 import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.repository.UserRepository;
 import de.cofinpro.recipeserver.service.impl.RegisterServiceImpl;
-import de.cofinpro.recipeserver.web.exception.UserAlreadyExistsException;
+import de.cofinpro.recipeserver.service.exception.UserAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

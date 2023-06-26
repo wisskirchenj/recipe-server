@@ -1,7 +1,7 @@
 package de.cofinpro.recipeserver.service;
 
 import de.cofinpro.recipeserver.entities.User;
-import de.cofinpro.recipeserver.web.exception.UserAlreadyExistsException;
+import de.cofinpro.recipeserver.service.exception.UserAlreadyExistsException;
 
 public interface RegisterService {
 

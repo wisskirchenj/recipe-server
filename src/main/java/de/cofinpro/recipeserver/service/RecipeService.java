@@ -1,8 +1,8 @@
 package de.cofinpro.recipeserver.service;
 
 import de.cofinpro.recipeserver.entities.Recipe;
-import de.cofinpro.recipeserver.web.exception.NotOwnerException;
-import de.cofinpro.recipeserver.web.exception.RecipeNotFoundException;
+import de.cofinpro.recipeserver.service.exception.NotOwnerException;
+import de.cofinpro.recipeserver.service.exception.RecipeNotFoundException;
 
 import java.util.List;
 

@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest(properties = { "spring.datasource.url=jdbc:h2:file:./src/test/resources/test_recipes_db"})
+@SpringBootTest(properties = { "spring.datasource.url=jdbc:postgresql://localhost:5432/recipetest"})
 @AutoConfigureMockMvc
 class RecipeServerApplicationIT {
 
@@ -54,7 +54,7 @@ class RecipeServerApplicationIT {
             setupMockUser();
         }
         mockUserheader = new HttpHeaders();
-        mockUserheader.setBasicAuth("a@b.c", "secret__");
+        mockUserheader.setBasicAuth("a@b.test", "secret__");
     }
 
     @Test
@@ -190,6 +190,6 @@ class RecipeServerApplicationIT {
     void setupMockUser() {
         mockUserIsSetup = true;
         Assertions.assertDoesNotThrow(() ->
-                registerService.registerUser(userMapper.toEntity(new UserDto("a@b.c", "secret__"))));
+                registerService.registerUser(userMapper.toEntity(new UserDto("a@b.test", "secret__"))));
     }
 }

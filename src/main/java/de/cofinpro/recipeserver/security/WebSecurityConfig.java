@@ -40,8 +40,7 @@ public class WebSecurityConfig {
                 .csrf(CsrfConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        // next line needed (esp. DispatcherType.ERROR) to prevent interception of AuthorizationFilter in
-                        // case of validation or UserExistsError and returning 401 (see https://stackoverflow.com/questions/74971183/)
+                        // next line needed (esp. DispatcherType.ERROR) to prevent interception of AuthorizationFilter in error dispatch
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/register", "/actuator/shutdown").permitAll()
                         .requestMatchers(HttpMethod.GET, "/error").permitAll()

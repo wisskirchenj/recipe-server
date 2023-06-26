@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = { "spring.datasource.url=jdbc:h2:file:./src/test/resources/test_sec_db"})
+@SpringBootTest(properties = { "spring.datasource.url=jdbc:postgresql://localhost:5432/recipetest"})
 @AutoConfigureMockMvc
 class RecipeServerSecurityIT {
 
@@ -81,7 +81,6 @@ class RecipeServerSecurityIT {
                         .content(objectMapper.writeValueAsString(mockUser)))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void registerUnauthenticatedInvalidDto_Gives400() throws Exception {

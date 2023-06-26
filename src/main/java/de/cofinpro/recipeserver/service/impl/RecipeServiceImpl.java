@@ -3,8 +3,8 @@ package de.cofinpro.recipeserver.service.impl;
 import de.cofinpro.recipeserver.entities.Recipe;
 import de.cofinpro.recipeserver.repository.RecipeRepository;
 import de.cofinpro.recipeserver.service.RecipeService;
-import de.cofinpro.recipeserver.web.exception.NotOwnerException;
-import de.cofinpro.recipeserver.web.exception.RecipeNotFoundException;
+import de.cofinpro.recipeserver.service.exception.NotOwnerException;
+import de.cofinpro.recipeserver.service.exception.RecipeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
