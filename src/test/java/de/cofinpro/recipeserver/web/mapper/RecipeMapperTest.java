@@ -1,7 +1,6 @@
 package de.cofinpro.recipeserver.web.mapper;
 
 import de.cofinpro.recipeserver.entities.Recipe;
-import de.cofinpro.recipeserver.entities.User;
 import de.cofinpro.recipeserver.web.dto.RecipeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
