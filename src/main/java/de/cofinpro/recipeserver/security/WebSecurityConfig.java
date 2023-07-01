@@ -26,7 +26,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // next line needed (esp. DispatcherType.ERROR) to prevent interception of AuthorizationFilter in error dispatch
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/register", "/actuator/shutdown").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/actuator/shutdown").permitAll()
                         .requestMatchers(HttpMethod.GET, "/error").permitAll()
                         .requestMatchers("/api/recipe/**").authenticated()
                         .anyRequest().denyAll())
