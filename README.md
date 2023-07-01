@@ -86,6 +86,3 @@ on category or name substrings with sorting by newest posted/ updated.
 01.01.23 Stage 5 completed. Added Spring security v 6.0 and a register endpoint for users to register. Only registered users
 may access the api/recipe endpoints. Further update / delete actions are only permitted, if the session user is the creator
 of a recipe (creator stored in recipe table).
-
-26.06.23 Image/artifact tag 0.3.0: Move to postgres-database. Implement Oauth2-authentication with oauth2-resource-server. Remove 
-User management and register endpoint, since this will be handled by authorization server with OIDC.
