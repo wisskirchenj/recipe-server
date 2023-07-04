@@ -26,7 +26,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 @RestController
-@RequestMapping("api/recipe")
+@RequestMapping("/api/recipe/")
 public class RecipeController {
 
     private final RecipeService service;

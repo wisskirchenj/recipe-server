@@ -1,6 +1,10 @@
 package de.cofinpro.recipeserver.security;
 
 import jakarta.servlet.DispatcherType;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,15 +12,31 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * new Spring security 6.0 style provision of SecurityFilterChain bean with the security configuration,
  * as well as PasswordProvider and AuthenticationManager that makes use of our UserDetails persistence.
  */
 @Configuration
+@ConfigurationProperties("security.oauth2")
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+    @Getter
+    @Setter
+    private String issuerValidatorUri;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,5 +51,22 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/recipe/**").authenticated()
                         .anyRequest().denyAll())
                 .build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(OAuth2ResourceServerProperties properties) {
+        if (Objects.isNull(issuerValidatorUri)) {
+            issuerValidatorUri = properties.getJwt().getIssuerUri();
+        }
+        List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
+        validators.add(new JwtTimestampValidator());
+        validators.add(new JwtIssuerValidator(issuerValidatorUri));
+        var oauth2TokenValidator = new DelegatingOAuth2TokenValidator<>(validators);
+
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+                .withIssuerLocation(properties.getJwt().getIssuerUri())
+                .build();
+        jwtDecoder.setJwtValidator(oauth2TokenValidator);
+        return jwtDecoder;
     }
 }
