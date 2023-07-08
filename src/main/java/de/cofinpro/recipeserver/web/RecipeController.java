@@ -26,7 +26,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 @RestController
-@RequestMapping("/api/recipe/")
+@RequestMapping("/api/recipe")
 public class RecipeController {
 
     private final RecipeService service;
@@ -49,6 +49,15 @@ public class RecipeController {
                                                        @AuthenticationPrincipal Jwt jwt) {
         var saved = service.add(mapper.toEntity(recipeDto, jwt.getSubject()));
         return ok(Collections.singletonMap("id", saved.getId()));
+    }
+
+    /**
+     * returns the first recipe if it exists.
+     * @return RecipeDto with 200 = OK if id is found, 404 else (RecipeNotFoundException).
+     */
+    @GetMapping
+    ResponseEntity<RecipeDto> getFirstRecipe() {
+        return ok(mapper.toDto(service.getById(1L)));
     }
 
     /**
