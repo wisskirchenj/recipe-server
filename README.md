@@ -15,7 +15,7 @@ Project goal is to implement a Spring boot recipe application with Spring Securi
 - Postgres Database
 - Lombok
 - Spring Tests with MockMvC
-- Gradle 8.1.1
+- Gradle 8.2
 
 ## Program description
 
