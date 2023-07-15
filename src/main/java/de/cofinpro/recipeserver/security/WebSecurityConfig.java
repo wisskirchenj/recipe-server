@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * new Spring security 6.0 style provision of SecurityFilterChain bean with the security configuration,
- * as well as PasswordProvider and AuthenticationManager that makes use of our UserDetails persistence.
+ * new Spring security 6.0 style provision of SecurityFilterChain bean with the security configuration
  */
 @Configuration
 @ConfigurationProperties("security.oauth2")

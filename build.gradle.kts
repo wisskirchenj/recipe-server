@@ -16,6 +16,7 @@ repositories {
 
 group = "de.cofinpro"
 version = "0.3.0-SNAPSHOT"
+val dockerHubRepo = "wisskirchenj/"
 
 configurations {
     compileOnly {
@@ -23,13 +24,12 @@ configurations {
     }
 }
 
-extra["hibernate.version"] = "6.1.7.Final" // temporary, I hope
+//extra["hibernate.version"] = "6.1.7.Final" // temporary, I hope
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.projectlombok:lombok")
@@ -47,5 +47,6 @@ tasks.named<Test>("test") {
 
 tasks.named<BootBuildImage>("bootBuildImage") {
     builder.set("dashaun/builder:tiny")
+    imageName.set(dockerHubRepo + rootProject.name + ":" + version)
     environment.put("BP_NATIVE_IMAGE", "true")
 }
