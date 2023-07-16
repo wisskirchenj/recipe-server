@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     id("org.springframework.boot") version "3.1.1"
-    id("io.spring.dependency-management") version "1.1.0"
+    id("io.spring.dependency-management") version "1.1.1"
     id("org.graalvm.buildtools.native") version "0.9.23"
 }
 
@@ -23,8 +23,6 @@ configurations {
         extendsFrom(configurations.annotationProcessor.get())
     }
 }
-
-//extra["hibernate.version"] = "6.1.7.Final" // temporary, I hope
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
