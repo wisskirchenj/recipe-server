@@ -32,6 +32,11 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public List<Recipe> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public List<Recipe> searchByCategory(String searchText) {
         return repository.findAllByCategoryEqualsIgnoreCaseOrderByDateTimeDesc(searchText);
     }

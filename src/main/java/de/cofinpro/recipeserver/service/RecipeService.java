@@ -15,6 +15,11 @@ public interface RecipeService {
     Recipe getById(long id) throws RecipeNotFoundException;
 
     /**
+     * find all stored recipes
+     */
+    List<Recipe> getAll();
+
+    /**
      * save given Recipe to the repository.
      * @return saved recipe enriched with id.
      */

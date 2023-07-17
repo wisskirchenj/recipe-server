@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,8 +57,8 @@ public class RecipeController {
      * @return RecipeDto with 200 = OK if id is found, 404 else (RecipeNotFoundException).
      */
     @GetMapping
-    ResponseEntity<RecipeDto> getFirstRecipe() {
-        return ok(mapper.toDto(service.getById(1L)));
+    ResponseEntity<List<RecipeDto>> getAllRecipes() {
+        return ok(service.getAll().stream().map(mapper::toDto).toList());
     }
 
     /**
@@ -77,8 +78,8 @@ public class RecipeController {
      * @return 200 with found Recipe[] or empty if no match, 400 if not exactly one of the given parameters is provided.
      */
     @GetMapping("search/")
-    ResponseEntity<RecipeDto[]> searchRecipes(@RequestParam Optional<String> category,
-                                                     @RequestParam Optional<String> name) {
+    ResponseEntity<List<RecipeDto>> searchRecipes(@RequestParam Optional<String> category,
+                                                  @RequestParam Optional<String> name) {
         if (category.isEmpty() == name.isEmpty()) {
             return badRequest().build();
         }
@@ -86,7 +87,7 @@ public class RecipeController {
                 .map(service::searchByCategory)
                 .or(() -> name.map(service::searchByName))
                 .orElseThrow();
-        return ok(foundRecipes.stream().map(mapper::toDto).toArray(RecipeDto[]::new));
+        return ok(foundRecipes.stream().map(mapper::toDto).toList());
     }
 
     /**
