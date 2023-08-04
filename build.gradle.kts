@@ -1,47 +1,32 @@
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
-    java
-    id("org.springframework.boot") version "3.1.2"
-    id("io.spring.dependency-management") version "1.1.2"
-    id("org.graalvm.buildtools.native") version "0.9.23"
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        url = uri("https://repo.spring.io/snapshot") // to try out snapshot versions
-    }
+    id("de.cofinpro.spring-native.common-conventions")
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.graalvm.buildtools)
 }
 
 group = "de.cofinpro"
 version = "0.3.3-SNAPSHOT"
-val dockerHubRepo = "wisskirchenj/"
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("org.postgresql:postgresql")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.jpa)
+    implementation(libs.spring.boot.validation)
+    implementation(libs.spring.boot.oauth2.resource)
+    implementation(libs.spring.boot.actuator)
+    compileOnly(libs.lombok)
+    developmentOnly(libs.spring.boot.devtools)
+    runtimeOnly(libs.postgresql)
+    annotationProcessor(libs.spring.boot.configuration.processor)
+    annotationProcessor(libs.lombok)
+    testImplementation(libs.spring.boot.test)
+    testImplementation(libs.spring.security.test)
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
+val dockerHubRepo = "wisskirchenj/"
 
 tasks.named<BootBuildImage>("bootBuildImage") {
     builder.set("dashaun/builder:tiny")

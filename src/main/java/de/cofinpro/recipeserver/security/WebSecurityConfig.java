@@ -28,13 +28,13 @@ import java.util.Objects;
 /**
  * new Spring security 6.0 style provision of SecurityFilterChain bean with the security configuration
  */
+@Getter
+@Setter
 @Configuration
 @ConfigurationProperties("security.oauth2")
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Getter
-    @Setter
     private String issuerValidatorUri;
 
     @Bean
