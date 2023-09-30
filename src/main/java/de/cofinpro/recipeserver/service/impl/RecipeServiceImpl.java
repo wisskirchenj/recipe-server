@@ -5,6 +5,9 @@ import de.cofinpro.recipeserver.repository.RecipeRepository;
 import de.cofinpro.recipeserver.service.RecipeService;
 import de.cofinpro.recipeserver.service.exception.NotOwnerException;
 import de.cofinpro.recipeserver.service.exception.RecipeNotFoundException;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,17 @@ import java.util.function.Consumer;
  * service layer class for serving "api/recipe" endpoints
  */
 @Service
+@Slf4j
 @RegisterReflectionForBinding({org.hibernate.generator.internal.CurrentTimestampGeneration.class})
 public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository repository;
+    private final ObservationRegistry observationRegistry;
 
     @Autowired
-    public RecipeServiceImpl(RecipeRepository repository) {
+    public RecipeServiceImpl(RecipeRepository repository, ObservationRegistry observationRegistry) {
         this.repository = repository;
+        this.observationRegistry = observationRegistry;
     }
 
     @Override
@@ -85,6 +91,10 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     private RecipeNotFoundException createNotFoundException(long id) {
+        Observation.createNotStarted("recipe.not.found", this.observationRegistry)
+                .contextualName("recipe.not.found")
+                .lowCardinalityKeyValue("missedId", String.valueOf(id))
+                .start();
         return new RecipeNotFoundException("recipe with id %d not found".formatted(id));
     }
 }

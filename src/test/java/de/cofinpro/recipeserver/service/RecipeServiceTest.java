@@ -29,7 +29,7 @@ class RecipeServiceTest {
 
     @BeforeEach
     void setUp() {
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository, null);
         test = new Recipe().setName("test").setDescription("test description").setId(2L);
     }
 

@@ -89,3 +89,7 @@ of a recipe (creator stored in recipe table).
 
 26.06.23 Image/artifact tag 0.3.0: Move to postgres-database. Implement Oauth2-authentication with oauth2-resource-server. Remove
 User management and register endpoint, since this will be handled by authorization server with OIDC.
+
+until 30.09.23 Add custom observability with actuator and Micrometer, add DemoController for rendering image media types.
+Setup http-client with token retrieval from Spring authorization server and bearer token authorization. Permit all 
+actuator endpoints for demo purposes. Add custom metrics `recipe.not.found` for recipe not found requests.

@@ -1,0 +1,25 @@
+###
+POST http://localhost:6060/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic gateway secret
+
+grant_type=client_credentials
+
+> {% client.global.set("oauth_token", response.body.access_token); %}
+
+###
+POST http://127.0.0.1:8080/api/recipe/new
+Authorization: Bearer {{oauth_token}}
+Content-Type: application/json
+
+{
+  "name": "Peas",
+  "category": "vegetables",
+  "description" : "delicious peas",
+  "ingredients": [
+    "sth"
+  ],
+  "directions": [
+    "cook peas"
+  ]
+}

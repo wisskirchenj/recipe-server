@@ -3,6 +3,7 @@ package de.cofinpro.recipeserver.security;
 import jakarta.servlet.DispatcherType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,7 @@ public class WebSecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/actuator/shutdown").permitAll()
                         .requestMatchers(HttpMethod.GET, "/error").permitAll()
+                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                         .requestMatchers("/api/recipe/**").authenticated()
                         .anyRequest().denyAll())
                 .build();

@@ -1,0 +1,30 @@
+###
+POST http://localhost:6060/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic gateway secret
+
+grant_type=client_credentials
+
+> {% client.global.set("oauth_token", response.body.access_token); %}
+
+###
+POST http://127.0.0.1:8080/api/recipe/new
+Authorization: Bearer {{oauth_token}}
+Content-Type: application/json
+
+{
+    "name": "veggie soup",
+    "category": "soup",
+    "description" : "less delicious soup",
+    "ingredients": [
+        "100g soup",
+        "100ml water",
+        "300g carrots",
+        "3 teaspoons of mustard"
+    ],
+    "directions": [
+        "cook water",
+        "boil vegiies",
+        "make soup"
+    ]
+}
