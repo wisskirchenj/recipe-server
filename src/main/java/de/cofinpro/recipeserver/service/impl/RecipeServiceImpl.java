@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.time.LocalDate.now;
+
 /**
  * service layer class for serving "api/recipe" endpoints
  */
@@ -27,7 +29,8 @@ public class RecipeServiceImpl implements RecipeService {
     private final ObservationRegistry observationRegistry;
 
     @Autowired
-    public RecipeServiceImpl(RecipeRepository repository, ObservationRegistry observationRegistry) {
+    public RecipeServiceImpl(RecipeRepository repository,
+                             ObservationRegistry observationRegistry) {
         this.repository = repository;
         this.observationRegistry = observationRegistry;
     }
@@ -93,7 +96,7 @@ public class RecipeServiceImpl implements RecipeService {
     private RecipeNotFoundException createNotFoundException(long id) {
         Observation.createNotStarted("recipe.not.found", this.observationRegistry)
                 .contextualName("recipe.not.found")
-                .lowCardinalityKeyValue("missedId", String.valueOf(id))
+                .lowCardinalityKeyValue("missedIdAtDate", id + "@" + now())
                 .start();
         return new RecipeNotFoundException("recipe with id %d not found".formatted(id));
     }
